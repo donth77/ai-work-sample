@@ -14,9 +14,9 @@ export default function TextEditor() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [loading, setLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("gpt-4.1-mini");
-  const [selectedLanguage, setSelectedLanguage] = useState("es");
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
 
-  const handleAI = async (command: string, language?: string) => {
+  const handleAI = async (command: string, language: string) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
@@ -32,8 +32,8 @@ export default function TextEditor() {
         model: selectedModel,
       };
 
-      // Add language parameter for translate command
-      if (command === "translate" && language) {
+      // Add language parameter
+      if (language) {
         requestBody.lang = language;
       }
 
@@ -123,20 +123,20 @@ export default function TextEditor() {
         }}
       >
         <button
-          onClick={() => handleAI("paraphrase")}
+          onClick={() => handleAI("paraphrase", selectedLanguage)}
           disabled={shouldDisableButtons}
         >
           AI Paraphrase
         </button>
         <button
-          onClick={() => handleAI("summarize")}
+          onClick={() => handleAI("summarize", selectedLanguage)}
           disabled={shouldDisableButtons}
         >
           AI Summarize
         </button>
 
         {/* Translate Button with Language Dropdown */}
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <button
             onClick={() => handleAI("translate", selectedLanguage)}
             disabled={shouldDisableButtons}

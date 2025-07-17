@@ -118,7 +118,8 @@ async fn ai_handler(
     }
 
     let language = request.lang.as_deref().unwrap_or("en");
-    
+    let language_name = get_language_name(language);
+
     // check model param
     let model = match request.model.as_deref() {
         Some("gpt-3.5-turbo") => "gpt-3.5-turbo",
@@ -134,27 +135,34 @@ async fn ai_handler(
     
     let system_prompt = match command {
         Command::Paraphrase => {
-            "You are an expert writing assistant specialized in paraphrasing text. \
-             Your task is to rewrite the given text while preserving its original meaning, \
-             but using different words, sentence structures, and phrasing. \
-             Make the paraphrased text clear, natural, and well-written. \
-             Only return the paraphrased text, nothing else."
+            &format!(
+                "You are an expert writing assistant specialized in paraphrasing text. \
+                Your task is to rewrite the given text while preserving its original meaning in the {} language, \
+                but using different words, sentence structures, and phrasing. \
+                Make the paraphrased text clear, natural, and well-written. \
+                If necessary, translate the paraphrased text to the {} language. Only return the paraphrased text, nothing else.",
+                language_name,
+                language_name
+            )
         },
         Command::Summarize => {
-            "You are an expert text summarizer. Your task is to create a concise, \
-             accurate summary of the given text that captures the main points and key information. \
-             Focus on the most important ideas while maintaining clarity and coherence. \
-             The summary should be significantly shorter than the original text. \
-             Only return the summary, nothing else."
+            &format!(
+                "You are an expert text summarizer. Your task is to create a concise, \
+                accurate summary of the given text that captures the main points and key information in the {} language. \
+                Focus on the most important ideas while maintaining clarity and coherence. \
+                The summary should be significantly shorter than the original text. \
+                If necessary, translate the summary to the {} language. Only return the summary, nothing else.",
+                language_name,
+                language_name
+            )
         },
         Command::Translate => {
-            let language = request.lang.as_ref().unwrap();
             &format!(
                 "You are an expert translator. Your task is to translate the given text to {}. \
                  Provide an accurate, natural-sounding translation that preserves the meaning and tone of the original text. \
                  Consider cultural context and idiomatic expressions when appropriate. \
                  Only return the translated text, nothing else.", 
-                get_language_name(language)
+                language_name
             )
         }
     };
@@ -202,7 +210,6 @@ fn cors() -> CorsLayer {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    env_logger::init();
     dotenv().ok();
 
     let state = AppState {
