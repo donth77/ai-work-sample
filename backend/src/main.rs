@@ -1,4 +1,5 @@
 use std::{env, sync::Arc};
+use std::net::SocketAddr;
 
 use axum::{
     extract::{rejection::JsonRejection, State},
@@ -214,7 +215,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(state)
         .layer(cors());
 
-    let listener = TcpListener::bind("0.0.0.0:8080").await?;
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
+    let addr: SocketAddr = format!("0.0.0.0:{}", port).parse()?;
+    let listener = TcpListener::bind(addr).await?;
     serve(listener, app).await?;
     Ok(())
 }

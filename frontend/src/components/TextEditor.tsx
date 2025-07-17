@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { RingLoader } from "react-spinners";
 import toast from "react-hot-toast";
 
